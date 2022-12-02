@@ -1,0 +1,17 @@
+.GameScreen {
+    border: 0.2rem solid black;
+    margin: 2rem auto;
+    max-width: 30rem;
+    padding: 1.5rem;
+}
+
+.Trivinoms {
+    display: flex;
+    justify-content: space-between;
+}
+
+.Computer, .Player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

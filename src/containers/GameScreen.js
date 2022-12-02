@@ -1,5 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import './GameScreen.css';
+
 import Start from '../components/Start';
+import TrivimonName from '../components/TrivimonName';
+import TrivimonImage from '../components/TrivimonImage';
+import TrivimonHPValues from '../components/TrivimonHPValues';
+import TrivimonHPBar from '../components/TrivimonHPBar';
+import MoveSelector from '../components/MoveSelector';
+import AttackInfo from '../components/AttackInfo';
+
+
 
 const GameScreen = () => {
 
@@ -16,14 +26,16 @@ const GameScreen = () => {
 
     useEffect( () => { 
         if (!trivimonCollection) {
-            getTrivimonCollection()
+            getTrivimonCollection();
         } else if (!playerTrivimon) {
-            getTrivimon(setPlayerTrivimon)
+            getTrivimon(setPlayerTrivimon);
         } else if (!computerTrivimon) {
-            getTrivimon(setComputerTrivimon)
+            getTrivimon(setComputerTrivimon);
         } else {
-            getTrivimonMoves(playerTrivimon, setPlayerMoves)
-            getTrivimonMoves(computerTrivimon, setComputerMoves)
+            getTrivimonMoves(playerTrivimon, setPlayerMoves);
+            getTrivimonMoves(computerTrivimon, setComputerMoves);
+            changePlayerHPremaining(playerTrivimon["hp"]);
+            changeComputerHPremaining(computerTrivimon["hp"]);
         }
     }, [trivimonCollection, playerTrivimon, computerTrivimon]);
 
@@ -31,15 +43,15 @@ const GameScreen = () => {
         changeGameState(true);
     }
 
-    const getTrivimonCollection = async () => {
-        await fetch("https://pokeapi.co/api/v2/generation/1/")
+    const getTrivimonCollection = () => {
+        fetch("https://pokeapi.co/api/v2/generation/1/")
         .then(res => res.json())
-        .then(trivimon => setTrivimonCollection(trivimon.trivimon_species));
+        .then(trivimon => setTrivimonCollection(trivimon.pokemon_species));
     }
 
-    const getTrivimon = async (allocateTrivimon) => {
+    const getTrivimon = (allocateTrivimon) => {
         let randomIndex = Math.floor(Math.random() * 150);
-        await fetch(`https://pokeapi.co/api/v2/trivimon/${trivimonCollection[Number(randomIndex)].name}`)
+        fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
         .then(res => res.json())
         .then(trivimon => allocateTrivimon({
             name: trivimon.forms[0].name,
@@ -76,6 +88,10 @@ const GameScreen = () => {
         setMoveDetails(moves)
     }
 
+    const updateMoveSelected = (move) => {
+        changeMoveSelected(move)
+    }
+
     return (
         <div className="GameScreen">
 
@@ -87,29 +103,30 @@ const GameScreen = () => {
 
             :
             <>
-                <div className="Player">
-                    <TrivimonName name={playerTrivimon.name}/>
-                    <TrivimonHPBar hp={playerTrivimon.hp}/>
-                    <TrivimonImage image={playerTrivimon.backImage}/>
-                </div>
+                <div className="Trivinoms">
+                    <div className="Player">
+                        <TrivimonName name={playerTrivimon.name}/>
+                        <TrivimonHPBar hp={playerTrivimon.hp} hpLeft={playerHPremaining}/>
+                        <TrivimonImage image={playerTrivimon.backImage}/>
+                    </div>
 
-                <div className="Player">
-                    <TrivimonImage image={computerTrivimon.frontImage}/>
-                    <TrivimonName name={computerTrivimon.name}/>
-                    <TrivimonHPBar hp={computerTrivimon.hp}/>
-                    <TrivimonHPValues hp={computerTrivimon.hp}/>
+                    <div className="Computer">
+                        <TrivimonImage image={computerTrivimon.frontImage}/>
+                        <TrivimonName name={computerTrivimon.name}/>
+                        <TrivimonHPBar hp={computerTrivimon.hp} hpLeft={computerHPremaining}/>
+                        <TrivimonHPValues hp={computerTrivimon.hp} hpLeft={computerHPremaining}/>
+                    </div>
                 </div>
                 
-                {!attackSelected ?
+                {!moveSelected ?
                     <div className="MoveSelector">
-                        <MoveSelector moves={playerMoves} onHover={} onSelection={}/>
+                        <MoveSelector moves={playerMoves} onSelection={updateMoveSelected}/>
                     </div>
                 :
                     <div>
-                        <AttackInfo selectedMove={}/>
+                        <AttackInfo selectedMove={moveSelected}/>
                     </div>
                 }
-
             </>
             }
         </div>
