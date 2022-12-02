@@ -1,0 +1,31 @@
+.Moves {
+    list-style: none;
+    width: 50%;
+}
+
+.moveButton {
+    width: 100%;
+    padding: 1rem;
+    border: 0;
+    background: white;
+}
+
+.moveButton:hover {
+    border: 0.2rem solid black;
+    cursor: pointer;
+}
+
+.MoveDetails {
+    border: 0.2rem solid black;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.MoveStats {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}

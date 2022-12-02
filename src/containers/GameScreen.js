@@ -17,12 +17,13 @@ const GameScreen = () => {
     const [gameStarted, changeGameState] = useState(false);
     const [playerTrivimon, setPlayerTrivimon] = useState(null);
     const [playerHPremaining, changePlayerHPremaining] = useState(null)
-    const [playerMoves, setPlayerMoves] = useState([])
+    const [playerMoves, setPlayerMoves] = useState(null)
     const [computerTrivimon, setComputerTrivimon] = useState(null);
     const [computerHPremaining, changeComputerHPremaining] = useState(null)
-    const [computerMoves, setComputerMoves] = useState([])
+    const [computerMoves, setComputerMoves] = useState(null)
     const [playerTurn, changePlayerTurn] = useState(false);
     const [moveSelected, changeMoveSelected] = useState(false);
+
 
     useEffect( () => { 
         if (!trivimonCollection) {
@@ -31,11 +32,12 @@ const GameScreen = () => {
             getTrivimon(setPlayerTrivimon);
         } else if (!computerTrivimon) {
             getTrivimon(setComputerTrivimon);
-        } else {
-            getTrivimonMoves(playerTrivimon, setPlayerMoves);
-            getTrivimonMoves(computerTrivimon, setComputerMoves);
+        } else if (!playerMoves) {
+            setPlayerMoves(getTrivimonMoves(playerTrivimon));
             changePlayerHPremaining(playerTrivimon["hp"]);
             changeComputerHPremaining(computerTrivimon["hp"]);
+        } else if (!computerMoves) {
+            setComputerMoves(getTrivimonMoves(computerTrivimon));
         }
     }, [trivimonCollection, playerTrivimon, computerTrivimon]);
 
@@ -70,7 +72,7 @@ const GameScreen = () => {
         }));
     }
 
-    const getTrivimonMoves = (player, setMoveDetails) => {
+    const getTrivimonMoves = (player) => {
         const moves = []
 
         player["moves"].forEach(move => {
@@ -85,7 +87,7 @@ const GameScreen = () => {
             });
         });
 
-        setMoveDetails(moves)
+        return moves;
     }
 
     const updateMoveSelected = (move) => {
@@ -118,15 +120,15 @@ const GameScreen = () => {
                     </div>
                 </div>
                 
-                {!moveSelected ?
+                {/* {!moveSelected ? */}
                     <div className="MoveSelector">
                         <MoveSelector moves={playerMoves} onSelection={updateMoveSelected}/>
                     </div>
-                :
-                    <div>
+                {/* : */}
+                    {/* <div>
                         <AttackInfo selectedMove={moveSelected}/>
-                    </div>
-                }
+                    </div> */}
+                {/* } */}
             </>
             }
         </div>
