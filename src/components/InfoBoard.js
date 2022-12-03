@@ -4,7 +4,7 @@ import AttackInfo from './AttackInfo';
 import './InfoBoard.css';
 
 const InfoBoard = ({playerTrivimonName, computerTrivimonName, moves, selectedMove, onMoveSelection}) => {
-    
+
     const [moveHovered, changeMoveHovered] = useState(null);
 
     const moveItems = moves.map((move, index) => {
@@ -23,7 +23,7 @@ const InfoBoard = ({playerTrivimonName, computerTrivimonName, moves, selectedMov
     }
 
     return (
-        <>
+        <div className="Info-Board">
             {!selectedMove ?
                 <div className="MoveDetails">
                     <ul className="Moves">
@@ -36,9 +36,11 @@ const InfoBoard = ({playerTrivimonName, computerTrivimonName, moves, selectedMov
                     </div>
                 </div>
             :
-            <AttackInfo selectedMove={selectedMove} playerTrivimonName={playerTrivimonName} computerTrivimonName={computerTrivimonName}/>
+                <div className="Attack-Info">
+                    <AttackInfo selectedMove={selectedMove} playerTrivimonName={playerTrivimonName} computerTrivimonName={computerTrivimonName}/>
+                </div>
             }   
-        </>
+        </div>
 
     );
 }

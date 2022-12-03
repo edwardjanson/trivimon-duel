@@ -48,7 +48,13 @@ const GameScreen = () => {
             } catch {}
         }
 
-    }, [trivimonCollection, playerTrivimon, computerTrivimon]);
+        if (selectedMove) {
+            setTimeout(function() {
+                changeSelectedMove(null);
+            }, 2000);
+        }
+
+    }, [trivimonCollection, playerTrivimon, computerTrivimon, selectedMove]);
 
     const onStartChange = () => {
         changeGameState(true);
