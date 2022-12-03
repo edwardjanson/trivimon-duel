@@ -124,7 +124,7 @@ const GameScreen = () => {
             .then(res => res.json())
             .then(moveDetails => {
                 moves.push({
-                    name: generateSlug(2, { format: "title" }),
+                    name: generateSlug(2, { format: "title", categories: {adjective: ["sounds", "touch"]}}),
                     precision: moveDetails.accuracy ? moveDetails.accuracy : 90,
                     competence: moveDetails.power ? moveDetails.power : 1
                 });
