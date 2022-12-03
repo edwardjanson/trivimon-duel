@@ -3,24 +3,26 @@ import MoveStats from './MoveStats';
 import AttackInfo from './AttackInfo';
 import './InfoBoard.css';
 
-const InfoBoard = ({playerTrivimonName, computerTrivimonName, moves, selectedMove, onMoveSelection}) => {
+const InfoBoard = ({playerTrivimonName, 
+                    computerTrivimonName, 
+                    moves, 
+                    selectedMove, 
+                    onMoveSelection, 
+                    textFinished,
+                    onMoveHover,
+                    moveHovered}) => {
 
-    const [moveHovered, changeMoveHovered] = useState(null);
 
     const moveItems = moves.map((move, index) => {
         return <li key={index} >
                     <button className="moveButton" key={index}  
                         onClick={() => onMoveSelection(move)} 
-                        onMouseEnter={()=> onHover(move)}
-                        onMouseLeave={()=> onHover(null)} 
+                        onMouseEnter={()=> onMoveHover(move)}
+                        onMouseLeave={()=> onMoveHover(null)} 
                         >{move.name}
                     </button>
                 </li>
     })
-
-    const onHover = (move) => {
-        changeMoveHovered(move);
-    }
 
     return (
         <div className="Info-Board">
@@ -37,7 +39,12 @@ const InfoBoard = ({playerTrivimonName, computerTrivimonName, moves, selectedMov
                 </div>
             :
                 <div className="Attack-Info">
-                    <AttackInfo selectedMove={selectedMove} playerTrivimonName={playerTrivimonName} computerTrivimonName={computerTrivimonName}/>
+                    <AttackInfo 
+                        selectedMove={selectedMove} 
+                        playerTrivimonName={playerTrivimonName} 
+                        computerTrivimonName={computerTrivimonName}
+                        textFinished={textFinished}
+                        />
                 </div>
             }   
         </div>

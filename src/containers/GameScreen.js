@@ -21,6 +21,8 @@ const GameScreen = () => {
     const [computerHPremaining, changeComputerHPremaining] = useState(null)
     const [playerTurn, changePlayerTurn] = useState(false);
     const [selectedMove, changeSelectedMove] = useState(null);
+    const [textFinished, changeTextFinished] = useState(false);
+    const [moveHovered, changeMoveHovered] = useState(null);
 
 
     useEffect( () => { 
@@ -49,12 +51,17 @@ const GameScreen = () => {
         }
 
         if (selectedMove) {
-            setTimeout(function() {
-                changeSelectedMove(null);
-            }, 2000);
+            if (textFinished) {
+                setTimeout(function() {
+                    changeSelectedMove(null);
+                }, 2000);
+                changePlayerTurn(false);
+                changeTextFinished(false);
+                changeMoveHovered(null);
+            }
         }
 
-    }, [trivimonCollection, playerTrivimon, computerTrivimon, selectedMove]);
+    }, [trivimonCollection, playerTrivimon, computerTrivimon, selectedMove, textFinished]);
 
     const onStartChange = () => {
         changeGameState(true);
@@ -111,6 +118,14 @@ const GameScreen = () => {
         changeSelectedMove(move);
     }
 
+    const updateTextFinished = (bool) => {
+        changeTextFinished(bool);
+    }
+
+    const onMoveHover = (move) => {
+        changeMoveHovered(move);
+    }
+
     return (
         <div className="GameScreen">
 
@@ -143,7 +158,11 @@ const GameScreen = () => {
                         computerTrivimonName={computerTrivimon.name} 
                         moves={playerTrivimon.moves} 
                         selectedMove={selectedMove} 
-                        onMoveSelection={updateSelectedMove}/>
+                        onMoveSelection={updateSelectedMove}
+                        textFinished={updateTextFinished}
+                        onMoveHover={onMoveHover}
+                        moveHovered={moveHovered}
+                        />
                 </div>
             </>
             }

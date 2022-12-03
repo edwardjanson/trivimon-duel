@@ -1,11 +1,24 @@
 import './AttackInfo.css';
+import Typewriter from 'typewriter-effect';
 
-const AttackInfo = ({selectedMove, playerTrivimonName, computerTrivimonName}) => {
+<span></span>
+
+const AttackInfo = ({selectedMove, playerTrivimonName, computerTrivimonName, textFinished}) => {
 
     return (
         <>
         {selectedMove ? 
-            <span>{playerTrivimonName} uses {selectedMove.name} on {computerTrivimonName}</span>
+            <Typewriter
+                options={{
+                    cursor: '',
+                    delay: 20
+                }}
+                onInit={(typewriter) => {
+                    typewriter.typeString(`${playerTrivimonName} uses ${selectedMove.name} on ${computerTrivimonName}`)
+                    .callFunction(() => textFinished(true))
+                    .start();
+                }}
+            />
         :
         ""
         }
