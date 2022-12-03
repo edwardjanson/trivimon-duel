@@ -32,10 +32,10 @@ const GameScreen = () => {
             getTrivimon(setPlayerTrivimon);
         } else if (!computerTrivimon) {
             getTrivimon(setComputerTrivimon);
-        } else if (playerTrivimon) {
+        } else if (!playerHPremaining || !computerHPremaining) {
             changePlayerHPremaining(playerTrivimon["hp"]);
             changeComputerHPremaining(computerTrivimon["hp"]);
-
+        } else if (playerTrivimon) {
             try {
                 if (Object.keys(playerTrivimon.moves[0]).length === 2) {
                     getTrivimonMoves(playerTrivimon, setPlayerTrivimon);
@@ -50,28 +50,42 @@ const GameScreen = () => {
             } catch {}
         }
 
-        if (selectedMove) {
-            if (textFinished) {
-                setTimeout(function() {
-                    changeSelectedMove(null);
-                }, 2000);
-                playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
-                changeTextFinished(false);
-                changeMoveHovered(null);
-            }
-        }
-
         if (!playerTurn && computerTrivimon) {
             const computerMoves = computerTrivimon.moves;
             const randomIndex = Math.floor(Math.random() * computerMoves.length);
             changeSelectedMove(computerMoves[randomIndex]);
-            console.log(selectedMove);
+        }
+
+        if (selectedMove) {
+            if (textFinished) {
+                setTimeout(function() {
+                    triviaDamage();
+                    changeSelectedMove(null);
+                    playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
+                }, 2000);
+                changeTextFinished(false);
+                changeMoveHovered(null);
+            }
         }
 
     }, [trivimonCollection, playerTrivimon, computerTrivimon, selectedMove, textFinished]);
 
     const onStartChange = () => {
         changeGameState(true);
+    }
+
+    const triviaDamage = () => {
+        const damageTotal = (((2 / 5) + 2) * selectedMove.power * playerTurn ? 
+            playerTrivimon.attack / computerTrivimon.defense
+            :
+            computerTrivimon.attack / playerTrivimon.defense
+            / 50) + 3
+        
+        console.log("triviaDamage", playerTurn, damageTotal)
+        playerTurn ? 
+        (computerHPremaining - damageTotal) < 0 ? changeComputerHPremaining(0) : changeComputerHPremaining(Math.round(computerHPremaining - damageTotal))
+        :
+        (playerHPremaining - damageTotal) < 0 ? changePlayerHPremaining(0) : changePlayerHPremaining(Math.round(playerHPremaining - damageTotal))
     }
 
     const getTrivimonCollection = () => {
