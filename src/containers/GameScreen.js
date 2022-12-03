@@ -6,7 +6,7 @@ import TrivimonName from '../components/TrivimonName';
 import TrivimonImage from '../components/TrivimonImage';
 import TrivimonHPValues from '../components/TrivimonHPValues';
 import TrivimonHPBar from '../components/TrivimonHPBar';
-import MoveSelector from '../components/MoveSelector';
+import InfoBoard from '../components/InfoBoard';
 import AttackInfo from '../components/AttackInfo';
 
 
@@ -20,7 +20,7 @@ const GameScreen = () => {
     const [computerTrivimon, setComputerTrivimon] = useState(null);
     const [computerHPremaining, changeComputerHPremaining] = useState(null)
     const [playerTurn, changePlayerTurn] = useState(false);
-    const [moveSelected, changeMoveSelected] = useState(null);
+    const [selectedMove, changeSelectedMove] = useState(null);
 
 
     useEffect( () => { 
@@ -31,7 +31,6 @@ const GameScreen = () => {
         } else if (!computerTrivimon) {
             getTrivimon(setComputerTrivimon);
         } else if (playerTrivimon) {
-            console.log(playerTrivimon)
             changePlayerHPremaining(playerTrivimon["hp"]);
             changeComputerHPremaining(computerTrivimon["hp"]);
 
@@ -84,7 +83,7 @@ const GameScreen = () => {
 
     const getTrivimonMoves = (trivimon, updateTrivimon) => {
         const newState = {...trivimon};
-        const moves = []
+        const moves = [];
 
         trivimon["moves"].forEach(move => {
             fetch(move.url)
@@ -98,12 +97,12 @@ const GameScreen = () => {
             });
         });
 
-        newState["moves"] = moves
-        updateTrivimon(newState)
+        newState["moves"] = moves;
+        updateTrivimon(newState);
     }
 
-    const updateMoveSelected = (move) => {
-        changeMoveSelected(move)
+    const updateSelectedMove = (move) => {
+        changeSelectedMove(move);
     }
 
     return (
@@ -132,15 +131,14 @@ const GameScreen = () => {
                     </div>
                 </div>
                 
-                {/* {!moveSelected ? */}
-                    <div className="MoveSelector">
-                        <MoveSelector moves={playerTrivimon.moves} onSelection={updateMoveSelected}/>
-                    </div>
-                {/* : */}
-                    {/* <div>
-                        <AttackInfo selectedMove={moveSelected}/>
-                    </div> */}
-                {/* } */}
+                <div className="InfoBoard">
+                    <InfoBoard 
+                        playerTrivimonName={playerTrivimon.name} 
+                        computerTrivimonName={computerTrivimon.name} 
+                        moves={playerTrivimon.moves} 
+                        selectedMove={selectedMove} 
+                        onMoveSelection={updateSelectedMove}/>
+                </div>
             </>
             }
         </div>
