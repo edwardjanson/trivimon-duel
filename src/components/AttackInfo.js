@@ -15,7 +15,8 @@ const AttackInfo = ({selectedMove,
             <Typewriter
                 options={{
                     cursor: '',
-                    delay: 20
+                    delay: 20,
+                    skipAddStyles: true
                 }}
                 onInit={(typewriter) => {
                     typewriter.typeString(

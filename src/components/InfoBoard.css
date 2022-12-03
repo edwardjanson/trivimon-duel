@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+
 .Moves {
     list-style: none;
     width: 50%;
 }
 
 .moveButton {
+    font-size: 0.7rem;
+    font-family: "Press Start 2P";
     border: 0.2rem solid white;
     width: 100%;
     padding: 1rem;

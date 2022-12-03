@@ -1,5 +1,7 @@
 .npBar {
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 1rem;
     width: 10rem;
-    height: 1rem;
-    padding: 1rem 0;
+    height: 2.6rem;
 }
