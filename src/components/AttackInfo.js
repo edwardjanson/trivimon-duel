@@ -3,7 +3,11 @@ import Typewriter from 'typewriter-effect';
 
 <span></span>
 
-const AttackInfo = ({selectedMove, playerTrivimonName, computerTrivimonName, textFinished}) => {
+const AttackInfo = ({selectedMove, 
+                    playerTrivimonName, 
+                    computerTrivimonName, 
+                    textFinished,
+                    playerAttack}) => {
 
     return (
         <>
@@ -14,7 +18,12 @@ const AttackInfo = ({selectedMove, playerTrivimonName, computerTrivimonName, tex
                     delay: 20
                 }}
                 onInit={(typewriter) => {
-                    typewriter.typeString(`${playerTrivimonName} uses ${selectedMove.name} on ${computerTrivimonName}`)
+                    typewriter.typeString(
+                        playerAttack ?
+                            `${playerTrivimonName} uses ${selectedMove.name} on ${computerTrivimonName}`
+                        :
+                            `${computerTrivimonName} uses ${selectedMove.name} on ${playerTrivimonName}`
+                        )
                     .callFunction(() => textFinished(true))
                     .start();
                 }}

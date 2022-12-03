@@ -55,10 +55,17 @@ const GameScreen = () => {
                 setTimeout(function() {
                     changeSelectedMove(null);
                 }, 2000);
-                changePlayerTurn(false);
+                playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
                 changeTextFinished(false);
                 changeMoveHovered(null);
             }
+        }
+
+        if (!playerTurn && computerTrivimon) {
+            const computerMoves = computerTrivimon.moves;
+            const randomIndex = Math.floor(Math.random() * computerMoves.length);
+            changeSelectedMove(computerMoves[randomIndex]);
+            console.log(selectedMove);
         }
 
     }, [trivimonCollection, playerTrivimon, computerTrivimon, selectedMove, textFinished]);
@@ -156,12 +163,13 @@ const GameScreen = () => {
                     <InfoBoard 
                         playerTrivimonName={playerTrivimon.name} 
                         computerTrivimonName={computerTrivimon.name} 
-                        moves={playerTrivimon.moves} 
+                        playerMoves={playerTrivimon.moves} 
                         selectedMove={selectedMove} 
                         onMoveSelection={updateSelectedMove}
                         textFinished={updateTextFinished}
                         onMoveHover={onMoveHover}
                         moveHovered={moveHovered}
+                        playerTurn={playerTurn}
                         />
                 </div>
             </>
