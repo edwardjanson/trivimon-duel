@@ -99,7 +99,7 @@ const GameScreen = () => {
         fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
         .then(res => res.json())
         .then(trivimon => allocateTrivimon({
-            name: generateSlug(2, { format: "title" }),
+            name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "appearance", "shapes"]}}),
             np: trivimon.stats[0].base_stat,
             iq: trivimon.stats[1].base_stat,
             resilience: trivimon.stats[2].base_stat,
