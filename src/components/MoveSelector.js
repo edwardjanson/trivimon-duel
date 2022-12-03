@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './MoveSelector.css';
 
 const MoveSelector = ({moves, onSelection}) => {
 
     const [moveHovered, changeMoveHovered] = useState(null);
 
-    const onHover = (move) => {
-        changeMoveHovered(move);
-    }
-
     const moveItems = moves.map((move, index) => {
         return <li key={index} >
                     <button className="moveButton" key={index}  
-                        onClick={onSelection(move)} 
+                        onClick={() => onSelection(move)} 
                         onMouseEnter={()=> onHover(move)}
                         onMouseLeave={()=> onHover(null)} 
                         >{move.name}
                     </button>
                 </li>
     })
+
+    const onHover = (move) => {
+        changeMoveHovered(move);
+    }
 
     return (
         <div className="MoveDetails">

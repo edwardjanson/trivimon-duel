@@ -17,12 +17,10 @@ const GameScreen = () => {
     const [gameStarted, changeGameState] = useState(false);
     const [playerTrivimon, setPlayerTrivimon] = useState(null);
     const [playerHPremaining, changePlayerHPremaining] = useState(null)
-    const [playerMoves, setPlayerMoves] = useState(null)
     const [computerTrivimon, setComputerTrivimon] = useState(null);
     const [computerHPremaining, changeComputerHPremaining] = useState(null)
-    const [computerMoves, setComputerMoves] = useState(null)
     const [playerTurn, changePlayerTurn] = useState(false);
-    const [moveSelected, changeMoveSelected] = useState(false);
+    const [moveSelected, changeMoveSelected] = useState(null);
 
 
     useEffect( () => { 
@@ -32,13 +30,25 @@ const GameScreen = () => {
             getTrivimon(setPlayerTrivimon);
         } else if (!computerTrivimon) {
             getTrivimon(setComputerTrivimon);
-        } else if (!playerMoves) {
-            setPlayerMoves(getTrivimonMoves(playerTrivimon));
+        } else if (playerTrivimon) {
+            console.log(playerTrivimon)
             changePlayerHPremaining(playerTrivimon["hp"]);
             changeComputerHPremaining(computerTrivimon["hp"]);
-        } else if (!computerMoves) {
-            setComputerMoves(getTrivimonMoves(computerTrivimon));
+
+            try {
+                if (Object.keys(playerTrivimon.moves[0]).length === 2) {
+                    getTrivimonMoves(playerTrivimon, setPlayerTrivimon);
+                }
+            } catch {}
+            
+        } else if (computerTrivimon) {
+            try {
+                if (Object.keys(computerTrivimon.moves[0]).length === 2) {
+                    getTrivimonMoves(computerTrivimon, setComputerTrivimon);
+                }
+            } catch {}
         }
+
     }, [trivimonCollection, playerTrivimon, computerTrivimon]);
 
     const onStartChange = () => {
@@ -72,10 +82,11 @@ const GameScreen = () => {
         }));
     }
 
-    const getTrivimonMoves = (player) => {
+    const getTrivimonMoves = (trivimon, updateTrivimon) => {
+        const newState = {...trivimon};
         const moves = []
 
-        player["moves"].forEach(move => {
+        trivimon["moves"].forEach(move => {
             fetch(move.url)
             .then(res => res.json())
             .then(moveDetails => {
@@ -87,7 +98,8 @@ const GameScreen = () => {
             });
         });
 
-        return moves;
+        newState["moves"] = moves
+        updateTrivimon(newState)
     }
 
     const updateMoveSelected = (move) => {
@@ -122,7 +134,7 @@ const GameScreen = () => {
                 
                 {/* {!moveSelected ? */}
                     <div className="MoveSelector">
-                        <MoveSelector moves={playerMoves} onSelection={updateMoveSelected}/>
+                        <MoveSelector moves={playerTrivimon.moves} onSelection={updateMoveSelected}/>
                     </div>
                 {/* : */}
                     {/* <div>

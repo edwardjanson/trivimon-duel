@@ -4,9 +4,9 @@
 }
 
 .moveButton {
+    border: 0.2rem solid white;
     width: 100%;
     padding: 1rem;
-    border: 0;
     background: white;
 }
 
@@ -17,7 +17,7 @@
 
 .MoveDetails {
     border: 0.2rem solid black;
-    margin-top: 2rem;
+    margin-top: 3rem;
     display: flex;
     justify-content: space-between;
 }
