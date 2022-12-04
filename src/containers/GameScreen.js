@@ -24,6 +24,7 @@ const GameScreen = () => {
     const [selectedMove, changeSelectedMove] = useState(null);
     const [textFinished, changeTextFinished] = useState(false);
     const [moveHovered, changeMoveHovered] = useState(null);
+    const [winner, setWinner] = useState(null)
 
 
     useEffect( () => { 
@@ -33,8 +34,9 @@ const GameScreen = () => {
             getTrivimon(setPlayerTrivimon);
         } else if (!computerTrivimon) {
             getTrivimon(setComputerTrivimon);
-        } else if (!playerHPremaining || !computerHPremaining) {
+        } else if (!playerHPremaining) {
             changePlayerHPremaining(playerTrivimon["np"]);
+        } else if (!computerHPremaining) {
             changeComputerHPremaining(computerTrivimon["np"]);
         } else if (playerTrivimon || computerTrivimon) {
             try {
@@ -48,6 +50,16 @@ const GameScreen = () => {
                     getTrivimonMoves(computerTrivimon, setComputerTrivimon);
                 }
             } catch {}
+        }
+
+        if (playerHPremaining === 0 || computerHPremaining === 0) {
+            setWinner(playerHPremaining === 0 ? "computer" : "player");
+            setPlayerTrivimon(null);
+            setComputerTrivimon(null);
+            changePlayerHPremaining(null);
+            changeComputerHPremaining(null);
+            changeGameState(false);
+            setWinner(false);
         }
 
         if (!playerTurn && computerTrivimon) {
@@ -71,6 +83,7 @@ const GameScreen = () => {
     }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, selectedMove, textFinished]);
 
     const onStartChange = () => {
+        playerTrivimon.pace > computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
         changeGameState(true);
     }
 
@@ -79,7 +92,7 @@ const GameScreen = () => {
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 3
+            / 50) + 3;
         
         console.log("triviaDamage", playerTurn, damageTotal)
         playerTurn ? 
@@ -99,7 +112,7 @@ const GameScreen = () => {
         fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
         .then(res => res.json())
         .then(trivimon => allocateTrivimon({
-            name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "appearance", "shapes"]}}),
+            name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "time", "shapes", "taste"]}}),
             np: trivimon.stats[0].base_stat,
             iq: trivimon.stats[1].base_stat,
             resilience: trivimon.stats[2].base_stat,
@@ -151,10 +164,14 @@ const GameScreen = () => {
         <div className="GameScreen">
 
             {!gameStarted ? 
-
-            <div className="Start">
-                <Start onStartChange={onStartChange}/>
-            </div>
+                !winner ?
+                <div className="Start">
+                <Start winner={winner} onStartChange={onStartChange}/>
+                </div>
+                :
+                <div className="Start">
+                    <Start winner={winner} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
+                </div>
 
             :
             <>
@@ -162,6 +179,7 @@ const GameScreen = () => {
                     <div className="Player">
                         <TrivimonName name={playerTrivimon.name}/>
                         <TrivimonNPBar np={playerTrivimon.np} npLeft={playerHPremaining}/>
+                        <TrivimonNPValues np={playerTrivimon.np} npLeft={playerHPremaining}/>
                         <TrivimonImage image={playerTrivimon.backImage}/>
                     </div>
 

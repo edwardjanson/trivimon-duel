@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
 
 .Moves {
+    text-align: left;
     list-style: none;
     width: 50%;
 }
@@ -29,7 +30,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center
+    justify-content: center;
+    gap: 0.8rem;
 }
 
 .Info-Board {
@@ -38,5 +40,5 @@
 }
 
 .Attack-Info {
-    padding: 2rem 0;
+    padding: 2rem;
 }
