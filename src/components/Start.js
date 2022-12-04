@@ -1,7 +1,7 @@
 import Typewriter from 'typewriter-effect';
 import './Start.css';
 
-const Start = ({winner, computerTrivimonName, onStartChange}) => {
+const Start = ({winner, onNewGame, computerTrivimonName, onStartChange}) => {
 
     return (
         <div className="Start-Screen">
@@ -15,7 +15,7 @@ const Start = ({winner, computerTrivimonName, onStartChange}) => {
                     typewriter.typeString(
                         winner ?
                             winner === "player" ?
-                            `$You outsmarted ${computerTrivimonName}!`
+                            `You outsmarted ${computerTrivimonName}!`
                             :
                             `${computerTrivimonName} outsmarted you!`
                         :
@@ -25,7 +25,7 @@ const Start = ({winner, computerTrivimonName, onStartChange}) => {
                 }}
             />
             {winner ?
-                <button className="Start" onClick={onStartChange}>Play Again</button>
+                <button className="Start" onClick={onNewGame}>Play Again</button>
             :
                 <button className="Start" onClick={onStartChange}>Start</button>
             }

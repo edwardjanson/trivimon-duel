@@ -36,42 +36,53 @@ const GameScreen = () => {
             if (!trivimonCollection) getTrivimonCollection();
             else if (!playerTrivimon) getTrivimon(setPlayerTrivimon, changePlayerHPremaining);
             else if (!computerTrivimon) getTrivimon(setComputerTrivimon, changeComputerHPremaining);
-            else changeGameLoaded(true);
-            
+            else {
+                playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
+                changeGameLoaded(true);
+            }
         } else {
+
             if (playerHPremaining === 0 || computerHPremaining === 0) {
                 setWinner(playerHPremaining === 0 ? "computer" : "player");
-                setPlayerTrivimon(null);
-                setComputerTrivimon(null);
-                changePlayerHPremaining(null);
-                changeComputerHPremaining(null);
                 changeGameState(false);
-                setWinner(false);
-                changeGameLoaded(false);
-            }
-    
-            if (!playerTurn) {
-                const computerMoves = computerTrivimon.moves;
-                const randomIndex = Math.floor(Math.random() * computerMoves.length);
-                changeSelectedMove(computerMoves[randomIndex]);
-            }
-    
-            if (selectedMove) {
-                if (textFinished) {
-                    setTimeout(function() {
-                        triviaDamage();
-                        changeSelectedMove(null);
-                        playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
-                    }, 1000);
-                    changeTextFinished(false);
-                    changeMoveHovered(null);
+            } else {
+
+                if (selectedMove) {
+                    if (textFinished) {
+                        setTimeout(function() {
+                            changePlayerTurn(!playerTurn);
+                            triviaDamage();
+                            changeSelectedMove(null);
+                        }, 1000);
+                        changeTextFinished(false);
+                        changeMoveHovered(null);
+                    }
                 }
+    
+                if (!playerTurn && !selectedMove) {
+                    const computerMoves = computerTrivimon.moves;
+                    console.log("computerMoves", computerMoves)
+                    const randomIndex = Math.floor(Math.random() * computerMoves.length);
+                    changeSelectedMove(computerMoves[randomIndex]);
+                }
+
             }
         }
-    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, selectedMove, textFinished]);
+    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished]);
+
 
     const onStartChange = () => {
-        playerTrivimon.pace > computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
+        changeGameState(true);
+    }
+
+    const onNewGame = () => {
+        changeSelectedMove(null)
+        setWinner(null);
+        setPlayerTrivimon(null);
+        setComputerTrivimon(null);
+        changePlayerHPremaining(null);
+        changeComputerHPremaining(null);
+        changeGameLoaded(false);
         changeGameState(true);
     }
 
@@ -80,7 +91,7 @@ const GameScreen = () => {
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 3;
+            / 50) + 25;
         
         console.log("triviaDamage", playerTurn, damageTotal)
         playerTurn ? 
@@ -132,7 +143,7 @@ const GameScreen = () => {
             });
 
             trivimonStats.moves = moves;
-            console.log(trivimonStats)
+            console.log("trivimonStats", trivimonStats)
             allocateTrivimon(trivimonStats);
             setHPRemaining(trivimonStats.np)
         });
@@ -152,52 +163,53 @@ const GameScreen = () => {
 
     return (
         <div className="GameScreen">
-        {!gameLoaded ?
-            "loading"
-        :
-            !gameStarted ? 
+            {!gameStarted ? 
                 !winner ?
                 <div className="Start">
                 <Start winner={winner} onStartChange={onStartChange}/>
                 </div>
                 :
                 <div className="Start">
-                    <Start winner={winner} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
+                    <Start winner={winner} onNewGame={onNewGame} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
                 </div>
-
             :
-            <>
-                <div className="Trivinoms">
-                    <div className="Player">
-                        <TrivimonName name={playerTrivimon.name}/>
-                        <TrivimonNPBar np={playerTrivimon.np} npLeft={playerHPremaining}/>
-                        <TrivimonNPValues np={playerTrivimon.np} npLeft={playerHPremaining}/>
-                        <TrivimonImage image={playerTrivimon.backImage}/>
+                !gameLoaded ?
+                    <div className="Start">
+                        <p>Loading...</p>
                     </div>
+                :
+                    <>
+                        <div className="Trivinoms">
+                            <div className="Player">
+                                <TrivimonName name={playerTrivimon.name}/>
+                                <TrivimonNPBar np={playerTrivimon.np} npLeft={playerHPremaining}/>
+                                <TrivimonNPValues np={playerTrivimon.np} npLeft={playerHPremaining}/>
+                                <TrivimonImage image={playerTrivimon.backImage}/>
+                            </div>
 
-                    <div className="Computer">
-                        <TrivimonImage image={computerTrivimon.frontImage}/>
-                        <TrivimonName name={computerTrivimon.name}/>
-                        <TrivimonNPBar np={computerTrivimon.np} npLeft={computerHPremaining}/>
-                        <TrivimonNPValues np={computerTrivimon.np} npLeft={computerHPremaining}/>
-                    </div>
-                </div>
-                
-                <div className="InfoBoard">
-                    <InfoBoard 
-                        playerTrivimonName={playerTrivimon.name} 
-                        computerTrivimonName={computerTrivimon.name} 
-                        playerMoves={playerTrivimon.moves} 
-                        selectedMove={selectedMove} 
-                        onMoveSelection={updateSelectedMove}
-                        textFinished={updateTextFinished}
-                        onMoveHover={onMoveHover}
-                        moveHovered={moveHovered}
-                        playerTurn={playerTurn}
-                        />
-                </div>
-            </>
-        }
+                            <div className="Computer">
+                                <TrivimonImage image={computerTrivimon.frontImage}/>
+                                <TrivimonName name={computerTrivimon.name}/>
+                                <TrivimonNPBar np={computerTrivimon.np} npLeft={computerHPremaining}/>
+                                <TrivimonNPValues np={computerTrivimon.np} npLeft={computerHPremaining}/>
+                            </div>
+                        </div>
+                        
+                        <div className="InfoBoard">
+                            <InfoBoard 
+                                playerTrivimonName={playerTrivimon.name} 
+                                computerTrivimonName={computerTrivimon.name} 
+                                playerMoves={playerTrivimon.moves} 
+                                selectedMove={selectedMove} 
+                                onMoveSelection={updateSelectedMove}
+                                textFinished={updateTextFinished}
+                                onMoveHover={onMoveHover}
+                                moveHovered={moveHovered}
+                                playerTurn={playerTurn}
+                                />
+                        </div>
+                    </>
+            }
         </div>
     );
 }
