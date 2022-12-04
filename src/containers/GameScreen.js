@@ -54,14 +54,17 @@ const GameScreen = () => {
                 const randomIndex = Math.floor(Math.random() * trivia.length);
                 changeTriviaToAnswer(trivia[randomIndex]);
                 const updatedTrivia = [...trivia];
-                updatedTrivia(randomIndex, 1);
+                updatedTrivia.splice(randomIndex, 1);
                 setTrivia(updatedTrivia)
                 changeTriviaAnswered(null);
             }
 
             if (triviaAnswered) {
 
-                triviaAnswered === "correct" ? changeTriviaMultiplier(2) : changeTriviaMultiplier(0.5);
+                triviaAnswered === "correct" ?
+                playerTurn ? changeTriviaMultiplier(3) : changeTriviaMultiplier(0.5)
+                :
+                playerTurn ? changeTriviaMultiplier(0.5) : changeTriviaMultiplier(3)
 
                 if (playerHPremaining === 0 || computerHPremaining === 0) {
                     setWinner(playerHPremaining === 0 ? "computer" : "player");
@@ -81,17 +84,16 @@ const GameScreen = () => {
                                 changePlayerTurn(!playerTurn);
                                 triviaDamage();
                                 changeSelectedMove(null);
+                                changeTextFinished(false);
+                                changeMoveHovered(null);
+                                changeTriviaToAnswer(null);
                             }, 1000);
-                            changeTextFinished(false);
-                            changeMoveHovered(null);
                         }
                     }
                 }
-
-                changeTriviaToAnswer(null);
             }
         }
-    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer]);
+    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer, triviaAnswered]);
 
 
     const onStartChange = () => {
@@ -111,11 +113,11 @@ const GameScreen = () => {
     }
 
     const triviaDamage = () => {
-        const damageTotal = (((2 / 5) + 2) * selectedMove.power * playerTurn ? 
+        const damageTotal = ((((2 / 5) + 2) * selectedMove.power * playerTurn ? 
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 5;
+            / 50) + 5) * triviaMultiplier;
         
         console.log("triviaDamage", playerTurn, damageTotal)
         playerTurn ? 
@@ -232,7 +234,7 @@ const GameScreen = () => {
                                 playerMoves={playerTrivimon.moves} 
                                 selectedMove={selectedMove} 
                                 onMoveSelection={updateSelectedMove}
-                                textFinished={updateTextFinished}
+                                updateTextFinished={updateTextFinished}
                                 onMoveHover={onMoveHover}
                                 moveHovered={moveHovered}
                                 playerTurn={playerTurn}

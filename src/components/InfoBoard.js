@@ -9,7 +9,7 @@ const InfoBoard = ({playerTrivimonName,
                     playerMoves, 
                     selectedMove, 
                     onMoveSelection, 
-                    textFinished,
+                    updateTextFinished,
                     onMoveHover,
                     moveHovered,
                     playerTurn,
@@ -35,7 +35,7 @@ const InfoBoard = ({playerTrivimonName,
             <div className="Trivia">
                 <Trivia triviaToAnswer={triviaToAnswer} 
                         changeTriviaAnswered={changeTriviaAnswered}
-                        textFinished={textFinished}
+                        updateTextFinished={updateTextFinished}
                 />
             </div>
         :
@@ -46,7 +46,7 @@ const InfoBoard = ({playerTrivimonName,
                             selectedMove={selectedMove}
                             playerTrivimonName={playerTrivimonName} 
                             computerTrivimonName={computerTrivimonName}
-                            textFinished={textFinished}
+                            updateTextFinished={updateTextFinished}
                         />
                 </div>
             :
@@ -68,6 +68,7 @@ const InfoBoard = ({playerTrivimonName,
                                 selectedMove={selectedMove} 
                                 playerTrivimonName={playerTrivimonName} 
                                 computerTrivimonName={computerTrivimonName}
+                                updateTextFinished={updateTextFinished}
                             />
                         </div>
                 }   

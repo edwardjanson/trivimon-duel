@@ -6,7 +6,7 @@ import Typewriter from 'typewriter-effect';
 const AttackInfo = ({selectedMove, 
                     playerTrivimonName, 
                     computerTrivimonName, 
-                    textFinished,
+                    updateTextFinished,
                     playerAttack}) => {
 
     return (
@@ -25,7 +25,7 @@ const AttackInfo = ({selectedMove,
                         :
                             `${computerTrivimonName} uses ${selectedMove.name} on ${playerTrivimonName}`
                         )
-                    .callFunction(() => textFinished(true))
+                    .callFunction(() => updateTextFinished(true))
                     .start();
                 }}
             />

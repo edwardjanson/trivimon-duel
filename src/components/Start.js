@@ -12,16 +12,19 @@ const Start = ({winner, onNewGame, computerTrivimonName, onStartChange}) => {
                     skipAddStyles: true
                 }}
                 onInit={(typewriter) => {
-                    typewriter.typeString(
-                        winner ?
+                    winner ?
+                        typewriter.typeString(
                             winner === "player" ?
                             `You outsmarted ${computerTrivimonName}!`
                             :
                             `${computerTrivimonName} outsmarted you!`
-                        :
-                            `Intro text`
                         )
-                    .start();
+                    : typewriter.typeString(
+                            `Welcome to Trivimon Duel! 
+                            To win, answer questions correctly and multiply your damage/ decrease damage received. 
+                            Good luck!
+                            P.S. Names and moves a generated randomly :)`
+                        ).start();
                 }}
             />
             {winner ?
