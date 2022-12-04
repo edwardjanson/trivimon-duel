@@ -8,79 +8,67 @@ import TrivimonImage from '../components/TrivimonImage';
 import TrivimonNPValues from '../components/TrivimonNPValues';
 import TrivimonNPBar from '../components/TrivimonNPBar';
 import InfoBoard from '../components/InfoBoard';
-import AttackInfo from '../components/AttackInfo';
-
 
 
 const GameScreen = () => {
 
-    const [trivimonCollection, setTrivimonCollection] = useState(null);
+    // game logic
+    const [gameLoaded, changeGameLoaded] = useState(false);
     const [gameStarted, changeGameState] = useState(false);
+    const [winner, setWinner] = useState(null)
+    const [playerTurn, changePlayerTurn] = useState(false);
+    const [selectedMove, changeSelectedMove] = useState(null);
+
+    // data
+    const [trivimonCollection, setTrivimonCollection] = useState(null);
     const [playerTrivimon, setPlayerTrivimon] = useState(null);
     const [playerHPremaining, changePlayerHPremaining] = useState(null)
     const [computerTrivimon, setComputerTrivimon] = useState(null);
     const [computerHPremaining, changeComputerHPremaining] = useState(null)
-    const [playerTurn, changePlayerTurn] = useState(false);
-    const [selectedMove, changeSelectedMove] = useState(null);
+
+    // other
     const [textFinished, changeTextFinished] = useState(false);
     const [moveHovered, changeMoveHovered] = useState(null);
-    const [winner, setWinner] = useState(null)
 
 
     useEffect( () => { 
-        if (!trivimonCollection) {
-            getTrivimonCollection();
-        } else if (!playerTrivimon) {
-            getTrivimon(setPlayerTrivimon);
-        } else if (!computerTrivimon) {
-            getTrivimon(setComputerTrivimon);
-        } else if (!playerHPremaining) {
-            changePlayerHPremaining(playerTrivimon["np"]);
-        } else if (!computerHPremaining) {
-            changeComputerHPremaining(computerTrivimon["np"]);
-        } else if (playerTrivimon || computerTrivimon) {
-            try {
-                if (Object.keys(playerTrivimon.moves[0]).length === 2) {
-                    getTrivimonMoves(playerTrivimon, setPlayerTrivimon);
+        if (!gameLoaded) {
+            if (!trivimonCollection) getTrivimonCollection();
+            else if (!playerTrivimon) getTrivimon(setPlayerTrivimon, changePlayerHPremaining);
+            else if (!computerTrivimon) getTrivimon(setComputerTrivimon, changeComputerHPremaining);
+            else changeGameLoaded(true);
+            
+        } else {
+            if (playerHPremaining === 0 || computerHPremaining === 0) {
+                setWinner(playerHPremaining === 0 ? "computer" : "player");
+                setPlayerTrivimon(null);
+                setComputerTrivimon(null);
+                changePlayerHPremaining(null);
+                changeComputerHPremaining(null);
+                changeGameState(false);
+                setWinner(false);
+                changeGameLoaded(false);
+            }
+    
+            if (!playerTurn) {
+                const computerMoves = computerTrivimon.moves;
+                const randomIndex = Math.floor(Math.random() * computerMoves.length);
+                changeSelectedMove(computerMoves[randomIndex]);
+            }
+    
+            if (selectedMove) {
+                if (textFinished) {
+                    setTimeout(function() {
+                        triviaDamage();
+                        changeSelectedMove(null);
+                        playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
+                    }, 1000);
+                    changeTextFinished(false);
+                    changeMoveHovered(null);
                 }
-            } catch {}
-
-            try {
-                if (Object.keys(computerTrivimon.moves[0]).length === 2) {
-                    getTrivimonMoves(computerTrivimon, setComputerTrivimon);
-                }
-            } catch {}
-        }
-
-        if (playerHPremaining === 0 || computerHPremaining === 0) {
-            setWinner(playerHPremaining === 0 ? "computer" : "player");
-            setPlayerTrivimon(null);
-            setComputerTrivimon(null);
-            changePlayerHPremaining(null);
-            changeComputerHPremaining(null);
-            changeGameState(false);
-            setWinner(false);
-        }
-
-        if (!playerTurn && computerTrivimon) {
-            const computerMoves = computerTrivimon.moves;
-            const randomIndex = Math.floor(Math.random() * computerMoves.length);
-            changeSelectedMove(computerMoves[randomIndex]);
-        }
-
-        if (selectedMove) {
-            if (textFinished) {
-                setTimeout(function() {
-                    triviaDamage();
-                    changeSelectedMove(null);
-                    playerTurn ? changePlayerTurn(false) : changePlayerTurn(true);
-                }, 1000);
-                changeTextFinished(false);
-                changeMoveHovered(null);
             }
         }
-
-    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, selectedMove, textFinished]);
+    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, selectedMove, textFinished]);
 
     const onStartChange = () => {
         playerTrivimon.pace > computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
@@ -107,45 +95,47 @@ const GameScreen = () => {
         .then(trivimon => setTrivimonCollection(trivimon.pokemon_species));
     }
 
-    const getTrivimon = (allocateTrivimon) => {
-        let randomIndex = Math.floor(Math.random() * 150);
-        fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
-        .then(res => res.json())
-        .then(trivimon => allocateTrivimon({
-            name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "time", "shapes", "taste"]}}),
-            np: trivimon.stats[0].base_stat,
-            iq: trivimon.stats[1].base_stat,
-            resilience: trivimon.stats[2].base_stat,
-            pace: trivimon.stats[5].base_stat,
-            moves: trivimon.moves.filter(move => 
-                move.version_group_details[0].level_learned_at === 1 
-                && move.version_group_details[0].version_group.name === "red-blue"
-                ).map(move => {
-                    return {name: move.move.name, url: move.move.url}
-                }),
-            frontImage: trivimon.sprites.front_default,
-            backImage: trivimon.sprites.back_default
-        }));
-    }
-
-    const getTrivimonMoves = (trivimon, updateTrivimon) => {
-        const newState = {...trivimon};
+    const getTrivimon = (allocateTrivimon, setHPRemaining) => {
+        let trivimonStats = {}
         const moves = [];
 
-        trivimon["moves"].forEach(move => {
-            fetch(move.url)
-            .then(res => res.json())
-            .then(moveDetails => {
-                moves.push({
-                    name: generateSlug(2, { format: "title", categories: {adjective: ["sounds", "touch"]}}),
-                    precision: moveDetails.accuracy ? moveDetails.accuracy : 90,
-                    competence: moveDetails.power ? moveDetails.power : 1
+        let randomIndex = Math.floor(Math.random() * 150);
+        fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
+        .then(trivimonData => trivimonData.json())
+        .then(trivimon => {
+            trivimonStats = {
+                name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "time", "shapes", "taste"]}}),
+                np: trivimon.stats[0].base_stat,
+                iq: trivimon.stats[1].base_stat,
+                resilience: trivimon.stats[2].base_stat,
+                pace: trivimon.stats[5].base_stat,
+                moves: trivimon.moves.filter(move => 
+                    move.version_group_details[0].level_learned_at === 1 
+                    && move.version_group_details[0].version_group.name === "red-blue"
+                    ).map(move => {
+                        return {name: move.move.name, url: move.move.url}
+                    }),
+                frontImage: trivimon.sprites.front_default,
+                backImage: trivimon.sprites.back_default
+            }
+
+            trivimonStats.moves.forEach(move => {
+                fetch(move.url)
+                .then(movesData => movesData.json())
+                .then(moveDetails => {
+                    moves.push({
+                        name: generateSlug(2, { format: "title", categories: {adjective: ["sounds", "touch"]}}),
+                        precision: moveDetails.accuracy ? moveDetails.accuracy : 90,
+                        competence: moveDetails.power ? moveDetails.power : 1
+                    })
                 });
             });
-        });
 
-        newState["moves"] = moves;
-        updateTrivimon(newState);
+            trivimonStats.moves = moves;
+            console.log(trivimonStats)
+            allocateTrivimon(trivimonStats);
+            setHPRemaining(trivimonStats.np)
+        });
     }
 
     const updateSelectedMove = (move) => {
@@ -162,8 +152,10 @@ const GameScreen = () => {
 
     return (
         <div className="GameScreen">
-
-            {!gameStarted ? 
+        {!gameLoaded ?
+            "loading"
+        :
+            !gameStarted ? 
                 !winner ?
                 <div className="Start">
                 <Start winner={winner} onStartChange={onStartChange}/>
@@ -205,7 +197,7 @@ const GameScreen = () => {
                         />
                 </div>
             </>
-            }
+        }
         </div>
     );
 }
