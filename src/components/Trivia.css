@@ -1,0 +1,24 @@
+.Option {
+    font-size: 0.7rem;
+    font-family: "Press Start 2P";
+    border: 0.2rem solid white;
+    width: 100%;
+    padding: 1rem;
+    background: white;
+}
+
+.Option:hover {
+    border: 0.2rem solid black;
+    cursor: pointer;
+}
+
+.Options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.Options > span {
+    padding: 1rem;
+    width: 42%;
+}
