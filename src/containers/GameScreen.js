@@ -20,6 +20,7 @@ const GameScreen = () => {
     const [selectedMove, changeSelectedMove] = useState(null);
     const [triviaAnswered, changeTriviaAnswered] = useState(null);
     const [triviaToAnswer, changeTriviaToAnswer] = useState(null);
+    const [triviaMultiplier, changeTriviaMultiplier] = useState(null);
 
     // data
     const [trivimonCollection, setTrivimonCollection] = useState(null);
@@ -52,9 +53,15 @@ const GameScreen = () => {
             if (!triviaToAnswer) {
                 const randomIndex = Math.floor(Math.random() * trivia.length);
                 changeTriviaToAnswer(trivia[randomIndex]);
+                const updatedTrivia = [...trivia];
+                updatedTrivia(randomIndex, 1);
+                setTrivia(updatedTrivia)
+                changeTriviaAnswered(null);
             }
 
             if (triviaAnswered) {
+
+                triviaAnswered === "correct" ? changeTriviaMultiplier(2) : changeTriviaMultiplier(0.5);
 
                 if (playerHPremaining === 0 || computerHPremaining === 0) {
                     setWinner(playerHPremaining === 0 ? "computer" : "player");
@@ -80,6 +87,8 @@ const GameScreen = () => {
                         }
                     }
                 }
+
+                changeTriviaToAnswer(null);
             }
         }
     }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer]);

@@ -2,7 +2,7 @@ const MoveStats = ({move}) => {
 
     return (
         <>
-            <span>Trivia Competence: {move.power}</span>
+            <span>Competence: {move.competence}</span>
             <span>Precision: {move.precision}</span>
         </>
     );

@@ -5,21 +5,20 @@ import Typewriter from 'typewriter-effect';
 
 const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
 
-    const [questionFinished, updateQuestionFinished] = useState(false);
-
-    useEffect( () => { 
-
-    }, []);
-    
+    const [questionFinished, setQuestionFinished] = useState(false);
+    const [answerSelected, setAnswerSelected] = useState(false);
+    const [answerCorrect, changeAnswerCorrect] = useState(null);
 
     const checkIfCorrect = (answer) => {
         if (answer === triviaToAnswer.correct_answer) {
-            changeTriviaAnswered("correct")
+            changeAnswerCorrect(true);
         } else {
-            changeTriviaAnswered("incorrect")
+            changeAnswerCorrect(false);
         }
-        updateQuestionFinished(false);
-
+        console.log("answer", answer)
+        console.log("correct answer", triviaToAnswer.correct_answer)
+        setAnswerSelected(true);
+        setQuestionFinished(false);
     }
 
     const randomIndex = Math.floor(Math.random() * 3);
@@ -27,7 +26,9 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
     if (options.length != 4) options.splice(randomIndex, 0, triviaToAnswer.correct_answer)
     
     return (
-                <>
+        <>
+        {!answerSelected ?
+            <>
                 <div className="Question">
                     <Typewriter
                         options={{
@@ -37,7 +38,7 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                         }}
                         onInit={(typewriter) => {
                             typewriter.typeString(triviaToAnswer.question)
-                            .callFunction(() => updateQuestionFinished(true))
+                            .callFunction(() => setQuestionFinished(true))
                             .start();
                         }}
                     />
@@ -75,7 +76,6 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
                                                 typewriter.typeString(options[1])
-                                                .callFunction(() => updateQuestionFinished(true))
                                                 .start();
                                             }, 1000);
                                         }}      
@@ -96,7 +96,6 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
                                                 typewriter.typeString(options[2])
-                                                .callFunction(() => updateQuestionFinished(true))
                                                 .start();
                                             }, 2000);
                                         }}      
@@ -117,7 +116,6 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
                                                 typewriter.typeString(options[3])
-                                                .callFunction(() => updateQuestionFinished(true))
                                                 .start();
                                             }, 3000);
                                         }}      
@@ -131,6 +129,33 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                     }
                 </div>
                 </>
+            :
+
+            <Typewriter
+                options={{
+                    cursor: '',
+                    delay: 20,
+                    skipAddStyles: true
+                }}
+                onInit={(typewriter) => {
+                    typewriter.typeString(
+                        answerCorrect ?
+                            `Correct answer!`
+                        :
+                            `Incorrect, the correct answer is ${triviaToAnswer.correct_answer}`
+                    )
+                    .callFunction(() => {
+                        setTimeout(function() {
+                            answerCorrect ? changeTriviaAnswered("correct") : changeTriviaAnswered("incorrect")
+                            setAnswerSelected(false);
+                            changeAnswerCorrect(null);
+                        }, 1000)
+                    })
+                    .start();
+                }}
+            />
+        }   
+        </>    
     );
 }
 
