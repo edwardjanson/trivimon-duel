@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MoveStats from './MoveStats';
 import AttackInfo from './AttackInfo';
+import Trivia from './Trivia';
 import './InfoBoard.css';
 
 const InfoBoard = ({playerTrivimonName, 
@@ -11,7 +12,10 @@ const InfoBoard = ({playerTrivimonName,
                     textFinished,
                     onMoveHover,
                     moveHovered,
-                    playerTurn}) => {
+                    playerTurn,
+                    triviaToAnswer,
+                    triviaAnswered,
+                    changeTriviaAnswered}) => {
 
 
     const moveItems = playerMoves.map((move, index) => {
@@ -27,7 +31,15 @@ const InfoBoard = ({playerTrivimonName,
 
     return (
         <div className="Info-Board">
-            {!playerTurn ?
+        {!triviaAnswered ?
+            <div className="Trivia">
+                <Trivia triviaToAnswer={triviaToAnswer} 
+                        changeTriviaAnswered={changeTriviaAnswered}
+                        textFinished={textFinished}
+                />
+            </div>
+        :
+            !playerTurn ?
                 <div className="Attack-Info">
                         <AttackInfo 
                             playerAttack={false}
@@ -56,7 +68,6 @@ const InfoBoard = ({playerTrivimonName,
                                 selectedMove={selectedMove} 
                                 playerTrivimonName={playerTrivimonName} 
                                 computerTrivimonName={computerTrivimonName}
-                                textFinished={textFinished}
                             />
                         </div>
                 }   

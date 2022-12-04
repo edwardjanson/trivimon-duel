@@ -18,13 +18,16 @@ const GameScreen = () => {
     const [winner, setWinner] = useState(null)
     const [playerTurn, changePlayerTurn] = useState(false);
     const [selectedMove, changeSelectedMove] = useState(null);
+    const [triviaAnswered, changeTriviaAnswered] = useState(null);
+    const [triviaToAnswer, changeTriviaToAnswer] = useState(null);
 
     // data
     const [trivimonCollection, setTrivimonCollection] = useState(null);
     const [playerTrivimon, setPlayerTrivimon] = useState(null);
-    const [playerHPremaining, changePlayerHPremaining] = useState(null)
+    const [playerHPremaining, changePlayerHPremaining] = useState(null);
     const [computerTrivimon, setComputerTrivimon] = useState(null);
-    const [computerHPremaining, changeComputerHPremaining] = useState(null)
+    const [computerHPremaining, changeComputerHPremaining] = useState(null);
+    const [trivia, setTrivia] = useState(null);
 
     // other
     const [textFinished, changeTextFinished] = useState(false);
@@ -36,39 +39,50 @@ const GameScreen = () => {
             if (!trivimonCollection) getTrivimonCollection();
             else if (!playerTrivimon) getTrivimon(setPlayerTrivimon, changePlayerHPremaining);
             else if (!computerTrivimon) getTrivimon(setComputerTrivimon, changeComputerHPremaining);
-            else {
+            else if (!trivia) getTrivia();
+            else if (!triviaToAnswer) {
+                const randomIndex = Math.floor(Math.random() * trivia.length);
+                changeTriviaToAnswer(trivia[randomIndex]);
+            } else {
                 playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
                 changeGameLoaded(true);
             }
         } else {
 
-            if (playerHPremaining === 0 || computerHPremaining === 0) {
-                setWinner(playerHPremaining === 0 ? "computer" : "player");
-                changeGameState(false);
-            } else {
+            if (!triviaToAnswer) {
+                const randomIndex = Math.floor(Math.random() * trivia.length);
+                changeTriviaToAnswer(trivia[randomIndex]);
+            }
 
-                if (selectedMove) {
-                    if (textFinished) {
-                        setTimeout(function() {
-                            changePlayerTurn(!playerTurn);
-                            triviaDamage();
-                            changeSelectedMove(null);
-                        }, 1000);
-                        changeTextFinished(false);
-                        changeMoveHovered(null);
+            if (triviaAnswered) {
+
+                if (playerHPremaining === 0 || computerHPremaining === 0) {
+                    setWinner(playerHPremaining === 0 ? "computer" : "player");
+                    changeGameState(false);
+                } else {
+
+                    if (!playerTurn && !selectedMove) {
+                        const computerMoves = computerTrivimon.moves;
+                        console.log("computerMoves", computerMoves)
+                        const randomIndex = Math.floor(Math.random() * computerMoves.length);
+                        changeSelectedMove(computerMoves[randomIndex]);
+                    }
+
+                    if (selectedMove) {
+                        if (textFinished) {
+                            setTimeout(function() {
+                                changePlayerTurn(!playerTurn);
+                                triviaDamage();
+                                changeSelectedMove(null);
+                            }, 1000);
+                            changeTextFinished(false);
+                            changeMoveHovered(null);
+                        }
                     }
                 }
-    
-                if (!playerTurn && !selectedMove) {
-                    const computerMoves = computerTrivimon.moves;
-                    console.log("computerMoves", computerMoves)
-                    const randomIndex = Math.floor(Math.random() * computerMoves.length);
-                    changeSelectedMove(computerMoves[randomIndex]);
-                }
-
             }
         }
-    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished]);
+    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer]);
 
 
     const onStartChange = () => {
@@ -76,7 +90,8 @@ const GameScreen = () => {
     }
 
     const onNewGame = () => {
-        changeSelectedMove(null)
+        setTrivia(null);
+        changeSelectedMove(null);
         setWinner(null);
         setPlayerTrivimon(null);
         setComputerTrivimon(null);
@@ -91,13 +106,19 @@ const GameScreen = () => {
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 25;
+            / 50) + 5;
         
         console.log("triviaDamage", playerTurn, damageTotal)
         playerTurn ? 
         (computerHPremaining - damageTotal) < 0 ? changeComputerHPremaining(0) : changeComputerHPremaining(Math.round(computerHPremaining - damageTotal))
         :
         (playerHPremaining - damageTotal) < 0 ? changePlayerHPremaining(0) : changePlayerHPremaining(Math.round(playerHPremaining - damageTotal))
+    }
+
+    const getTrivia = () => {
+        fetch("https://opentdb.com/api.php?amount=50&difficulty=hard&type=multiple")
+        .then(res => res.json())
+        .then(trivia => setTrivia(trivia.results));
     }
 
     const getTrivimonCollection = () => {
@@ -107,10 +128,10 @@ const GameScreen = () => {
     }
 
     const getTrivimon = (allocateTrivimon, setHPRemaining) => {
-        let trivimonStats = {}
+        let trivimonStats;
         const moves = [];
 
-        let randomIndex = Math.floor(Math.random() * 150);
+        const randomIndex = Math.floor(Math.random() * 150);
         fetch(`https://pokeapi.co/api/v2/pokemon/${trivimonCollection[Number(randomIndex)].name}`)
         .then(trivimonData => trivimonData.json())
         .then(trivimon => {
@@ -206,6 +227,9 @@ const GameScreen = () => {
                                 onMoveHover={onMoveHover}
                                 moveHovered={moveHovered}
                                 playerTurn={playerTurn}
+                                triviaToAnswer={triviaToAnswer}
+                                triviaAnswered={triviaAnswered}
+                                changeTriviaAnswered={changeTriviaAnswered}
                                 />
                         </div>
                     </>
