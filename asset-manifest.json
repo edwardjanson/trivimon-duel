@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/trivimon-duel/static/css/main.6a45aaab.css",
-    "main.js": "/trivimon-duel/static/js/main.2875b006.js",
+    "main.js": "/trivimon-duel/static/js/main.7e99d9f4.js",
     "static/js/787.014fb151.chunk.js": "/trivimon-duel/static/js/787.014fb151.chunk.js",
     "index.html": "/trivimon-duel/index.html",
     "main.6a45aaab.css.map": "/trivimon-duel/static/css/main.6a45aaab.css.map",
-    "main.2875b006.js.map": "/trivimon-duel/static/js/main.2875b006.js.map",
+    "main.7e99d9f4.js.map": "/trivimon-duel/static/js/main.7e99d9f4.js.map",
     "787.014fb151.chunk.js.map": "/trivimon-duel/static/js/787.014fb151.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6a45aaab.css",
-    "static/js/main.2875b006.js"
+    "static/js/main.7e99d9f4.js"
   ]
 }
