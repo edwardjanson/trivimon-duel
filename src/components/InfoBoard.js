@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import MoveStats from './MoveStats';
 import AttackInfo from './AttackInfo';
 import Trivia from './Trivia';

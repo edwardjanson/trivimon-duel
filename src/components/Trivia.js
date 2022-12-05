@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import './Trivia.css';
 
 import Typewriter from 'typewriter-effect';
@@ -23,7 +23,7 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
 
     const randomIndex = Math.floor(Math.random() * 3);
     const options = triviaToAnswer.incorrect_answers
-    if (options.length != 4) options.splice(randomIndex, 0, triviaToAnswer.correct_answer)
+    if (options.length !== 4) options.splice(randomIndex, 0, triviaToAnswer.correct_answer)
     
     return (
         <>

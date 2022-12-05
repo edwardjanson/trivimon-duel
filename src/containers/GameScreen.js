@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { generateSlug } from "random-word-slugs";
 import './GameScreen.css';
 
