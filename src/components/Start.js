@@ -18,7 +18,7 @@ const Start = ({winner, onNewGame, computerTrivimonName, onStartChange}) => {
                             `You outsmarted ${computerTrivimonName}!`
                             :
                             `${computerTrivimonName} outsmarted you!`
-                        )
+                        ).start()
                     : typewriter.typeString(
                             `Welcome to Trivimon Duel! 
                             To win, answer questions correctly and multiply your damage/ decrease damage received. 

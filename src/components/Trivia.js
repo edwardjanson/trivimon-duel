@@ -37,7 +37,10 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                             skipAddStyles: true
                         }}
                         onInit={(typewriter) => {
-                            typewriter.typeString(triviaToAnswer.question)
+                            typewriter.typeString(triviaToAnswer.question
+                                                    .replaceAll("&quot;", "'")
+                                                    .replaceAll("&#039;", "'")
+                                                    .replaceAll("&eacute;", "é"))
                             .callFunction(() => setQuestionFinished(true))
                             .start();
                         }}

@@ -127,7 +127,7 @@ const GameScreen = () => {
     }
 
     const getTrivia = () => {
-        fetch("https://opentdb.com/api.php?amount=50&difficulty=hard&type=multiple")
+        fetch("https://opentdb.com/api.php?amount=50&difficulty=medium&type=multiple")
         .then(res => res.json())
         .then(trivia => setTrivia(trivia.results));
     }
