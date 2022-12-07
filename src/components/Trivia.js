@@ -40,7 +40,8 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                             typewriter.typeString(triviaToAnswer.question
                                                     .replaceAll("&quot;", "'")
                                                     .replaceAll("&#039;", "'")
-                                                    .replaceAll("&eacute;", "é"))
+                                                    .replaceAll("&eacute;", "é")
+                                                    .replaceAll("&amp;", "&"))
                             .callFunction(() => setQuestionFinished(true))
                             .start();
                         }}
@@ -59,7 +60,11 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                             skipAddStyles: true
                                         }}
                                         onInit={(typewriter) => {
-                                            typewriter.typeString(options[0])
+                                            typewriter.typeString(options[0]
+                                                                .replaceAll("&quot;", "'")
+                                                                .replaceAll("&#039;", "'")
+                                                                .replaceAll("&eacute;", "é")
+                                                                .replaceAll("&amp;", "&"))
                                             .start();
                                         }}      
                                     />
@@ -78,7 +83,11 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         }}
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
-                                                typewriter.typeString(options[1])
+                                                typewriter.typeString(options[1]
+                                                                .replaceAll("&quot;", "'")
+                                                                .replaceAll("&#039;", "'")
+                                                                .replaceAll("&eacute;", "é")
+                                                                .replaceAll("&amp;", "&"))
                                                 .start();
                                             }, 1000);
                                         }}      
@@ -98,7 +107,11 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         }}
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
-                                                typewriter.typeString(options[2])
+                                                typewriter.typeString(options[2]
+                                                                    .replaceAll("&quot;", "'")
+                                                                    .replaceAll("&#039;", "'")
+                                                                    .replaceAll("&eacute;", "é")
+                                                                    .replaceAll("&amp;", "&"))
                                                 .start();
                                             }, 2000);
                                         }}      
@@ -118,7 +131,11 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
                                         }}
                                         onInit={(typewriter) => {
                                             setTimeout(function() {
-                                                typewriter.typeString(options[3])
+                                                typewriter.typeString(options[3]
+                                                                    .replaceAll("&quot;", "'")
+                                                                    .replaceAll("&#039;", "'")
+                                                                    .replaceAll("&eacute;", "é")
+                                                                    .replaceAll("&amp;", "&"))
                                                 .start();
                                             }, 3000);
                                         }}      

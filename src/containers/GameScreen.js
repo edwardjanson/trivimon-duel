@@ -93,7 +93,7 @@ const GameScreen = () => {
                 }
             }
         }
-    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer, triviaAnswered]);
+    }, [gameStarted, trivimonCollection, playerTrivimon, computerTrivimon, playerHPremaining, computerHPremaining, playerTurn, selectedMove, textFinished, triviaToAnswer, triviaAnswered, trivia]);
 
 
     const onStartChange = () => {
