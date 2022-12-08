@@ -43,8 +43,8 @@ const GameScreen = () => {
                     const pokeResponse = await fetch("https://pokeapi.co/api/v2/generation/1/")
                     const trivimons = await pokeResponse.json();
             
-                    getTrivimon(trivimons.pokemon_species, setPlayerTrivimon, changePlayerHPremaining);
-                    getTrivimon(trivimons.pokemon_species, setComputerTrivimon, changeComputerHPremaining);
+                    await getTrivimon(trivimons.pokemon_species, setPlayerTrivimon, changePlayerHPremaining);
+                    await getTrivimon(trivimons.pokemon_species, setComputerTrivimon, changeComputerHPremaining);
 
                     const triviaResponse = await fetch("https://opentdb.com/api.php?amount=50&difficulty=medium&type=multiple")
                     const triviaData = await triviaResponse.json();
@@ -59,12 +59,14 @@ const GameScreen = () => {
 
             fetchApis();
         } 
-        else if (errorLoading) {}
+        else if (errorLoading) {
+            return;
+        }
         else if (gameLoaded && firstTurn) {
-            playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
-            const randomIndex = Math.floor(Math.random() * trivia.length);
-            changeTriviaToAnswer(trivia[randomIndex]);
-            changeFirstTurn(false);
+                playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
+                const randomIndex = Math.floor(Math.random() * trivia.length);
+                changeTriviaToAnswer(trivia[randomIndex]);
+                changeFirstTurn(false);
         }
         else {
             if (!triviaToAnswer) {
@@ -90,7 +92,6 @@ const GameScreen = () => {
 
                     if (!playerTurn && !selectedMove) {
                         const computerMoves = computerTrivimon.moves;
-                        console.log("computerMoves", computerMoves)
                         const randomIndex = Math.floor(Math.random() * computerMoves.length);
                         changeSelectedMove(computerMoves[randomIndex]);
                     }
@@ -137,7 +138,6 @@ const GameScreen = () => {
             computerTrivimon.iq / playerTrivimon.resilience
             / 50) + 5) * triviaMultiplier;
         
-        console.log("triviaDamage", playerTurn, damageTotal)
         playerTurn ? 
         (computerHPremaining - damageTotal) < 0 ? changeComputerHPremaining(0) : changeComputerHPremaining(Math.round(computerHPremaining - damageTotal))
         :
@@ -186,7 +186,6 @@ const GameScreen = () => {
                         trivimonStats.moves = moveDetails;
                 })}
 
-                console.log("trivimonStats", trivimonStats)
                 allocateTrivimon(trivimonStats);
                 setHPRemaining(trivimonStats.np);
             }
