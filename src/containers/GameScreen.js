@@ -112,7 +112,7 @@ const GameScreen = () => {
             }
         }
         // eslint-disable-next-line
-    }, [gameLoaded, errorLoading, gameStarted, triviaAnswered, textFinished]);
+    }, [gameLoaded, errorLoading, triviaAnswered, textFinished]);
 
 
     const onStartChange = () => {
