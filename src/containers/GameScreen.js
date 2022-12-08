@@ -59,6 +59,7 @@ const GameScreen = () => {
 
             fetchApis();
         } 
+        else if (errorLoading) {}
         else if (gameLoaded && firstTurn) {
             playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
             const randomIndex = Math.floor(Math.random() * trivia.length);
@@ -150,41 +151,45 @@ const GameScreen = () => {
             const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${trivimons[Number(randomIndex)].name}`)
             const trivimonData = await response.json()
 
-            const trivimonStats = {
-                name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "time", "shapes", "taste"]}}),
-                np: trivimonData.stats[0].base_stat,
-                iq: trivimonData.stats[1].base_stat,
-                resilience: trivimonData.stats[2].base_stat,
-                pace: trivimonData.stats[5].base_stat,
-                moves: trivimonData.moves.filter(move => 
-                    move.version_group_details[0].level_learned_at === 1 
-                    && move.version_group_details[0].version_group.name === "red-blue"
-                    ).map(move => {
-                        return {name: move.move.name, url: move.move.url}
-                    }),
-                frontImage: trivimonData.sprites.front_default,
-                backImage: trivimonData.sprites.back_default
+            if (response.ok) {
+
+                const trivimonStats = {
+                    name: generateSlug(2, { format: "title", categories: {adjective: ["personality", "time", "shapes", "taste"]}}),
+                    np: trivimonData.stats[0].base_stat,
+                    iq: trivimonData.stats[1].base_stat,
+                    resilience: trivimonData.stats[2].base_stat,
+                    pace: trivimonData.stats[5].base_stat,
+                    moves: trivimonData.moves.filter(move => 
+                        move.version_group_details[0].level_learned_at === 1 
+                        && move.version_group_details[0].version_group.name === "red-blue"
+                        ).map(move => {
+                            return {name: move.move.name, url: move.move.url}
+                        }),
+                    frontImage: trivimonData.sprites.front_default,
+                    backImage: trivimonData.sprites.back_default
+                }
+
+                const movePromises = trivimonStats.moves.map(move => {
+                    return fetch(move.url).then(response => response.json()).catch(error => changeErrorLoading(true));
+                });
+
+                if (!errorLoading) {
+                await Promise.all(movePromises)
+                    .then((moves) => {
+                        const moveDetails = moves.map((move) => {
+                        return {
+                            name: generateSlug(2, { format: "title", categories: {adjective: ["sounds", "touch"]}}),
+                            precision: move.accuracy ? move.accuracy : 90,
+                            competence: move.power ? move.power : 1
+                        }})
+
+                        trivimonStats.moves = moveDetails;
+                })}
+
+                console.log("trivimonStats", trivimonStats)
+                allocateTrivimon(trivimonStats);
+                setHPRemaining(trivimonStats.np);
             }
-
-            const movePromises = trivimonStats.moves.map(move => {
-                return fetch(move.url).then(response => response.json())
-            });
-
-            await Promise.all(movePromises)
-                .then((moves) => {
-                    const moveDetails = moves.map((move) => {
-                    return {
-                        name: generateSlug(2, { format: "title", categories: {adjective: ["sounds", "touch"]}}),
-                        precision: move.accuracy ? move.accuracy : 90,
-                        competence: move.power ? move.power : 1
-                    }})
-
-                    trivimonStats.moves = moveDetails;
-            });
-
-            console.log("trivimonStats", trivimonStats)
-            allocateTrivimon(trivimonStats);
-            setHPRemaining(trivimonStats.np)
 
         } catch {
             changeErrorLoading(true);
@@ -205,56 +210,61 @@ const GameScreen = () => {
 
     return (
         <div className="GameScreen">
-            {!gameStarted ? 
-                !winner ?
+            {errorLoading ?
                 <div className="Start">
-                <Start winner={winner} onStartChange={onStartChange}/>
+                            <p>There was an error loading the game, please refresh the page...</p>
                 </div>
                 :
-                <div className="Start">
-                    <Start winner={winner} onNewGame={onNewGame} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
-                </div>
-            :
-                !gameLoaded || errorLoading ?
+                !gameStarted ? 
+                    !winner ?
                     <div className="Start">
-                        <p>{errorLoading ? "There was an error loading the game, please refresh the page..." : "Loading..."}</p>
+                    <Start winner={winner} onStartChange={onStartChange}/>
+                    </div>
+                    :
+                    <div className="Start">
+                        <Start winner={winner} onNewGame={onNewGame} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
                     </div>
                 :
-                    <>
-                        <div className="Trivinoms">
-                            <div className="Player">
-                                <TrivimonName name={playerTrivimon.name}/>
-                                <TrivimonNPBar np={playerTrivimon.np} npLeft={playerHPremaining}/>
-                                <TrivimonNPValues np={playerTrivimon.np} npLeft={playerHPremaining}/>
-                                <TrivimonImage image={playerTrivimon.backImage}/>
-                            </div>
+                    !gameLoaded ?
+                        <div className="Start">
+                            <p>Loading...</p>
+                        </div>
+                    :
+                        <>
+                            <div className="Trivinoms">
+                                <div className="Player">
+                                    <TrivimonName name={playerTrivimon.name}/>
+                                    <TrivimonNPBar np={playerTrivimon.np} npLeft={playerHPremaining}/>
+                                    <TrivimonNPValues np={playerTrivimon.np} npLeft={playerHPremaining}/>
+                                    <TrivimonImage image={playerTrivimon.backImage}/>
+                                </div>
 
-                            <div className="Computer">
-                                <TrivimonImage image={computerTrivimon.frontImage}/>
-                                <TrivimonName name={computerTrivimon.name}/>
-                                <TrivimonNPBar np={computerTrivimon.np} npLeft={computerHPremaining}/>
-                                <TrivimonNPValues np={computerTrivimon.np} npLeft={computerHPremaining}/>
+                                <div className="Computer">
+                                    <TrivimonImage image={computerTrivimon.frontImage}/>
+                                    <TrivimonName name={computerTrivimon.name}/>
+                                    <TrivimonNPBar np={computerTrivimon.np} npLeft={computerHPremaining}/>
+                                    <TrivimonNPValues np={computerTrivimon.np} npLeft={computerHPremaining}/>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="InfoBoard">
-                            <InfoBoard 
-                                playerTrivimonName={playerTrivimon.name} 
-                                computerTrivimonName={computerTrivimon.name} 
-                                playerMoves={playerTrivimon.moves} 
-                                selectedMove={selectedMove} 
-                                onMoveSelection={updateSelectedMove}
-                                updateTextFinished={updateTextFinished}
-                                onMoveHover={onMoveHover}
-                                moveHovered={moveHovered}
-                                playerTurn={playerTurn}
-                                triviaToAnswer={triviaToAnswer}
-                                triviaAnswered={triviaAnswered}
-                                changeTriviaAnswered={changeTriviaAnswered}
-                                />
-                        </div>
-                    </>
-            }
+                            
+                            <div className="InfoBoard">
+                                <InfoBoard 
+                                    playerTrivimonName={playerTrivimon.name} 
+                                    computerTrivimonName={computerTrivimon.name} 
+                                    playerMoves={playerTrivimon.moves} 
+                                    selectedMove={selectedMove} 
+                                    onMoveSelection={updateSelectedMove}
+                                    updateTextFinished={updateTextFinished}
+                                    onMoveHover={onMoveHover}
+                                    moveHovered={moveHovered}
+                                    playerTurn={playerTurn}
+                                    triviaToAnswer={triviaToAnswer}
+                                    triviaAnswered={triviaAnswered}
+                                    changeTriviaAnswered={changeTriviaAnswered}
+                                    />
+                            </div>
+                        </>
+                }
         </div>
     );
 }
