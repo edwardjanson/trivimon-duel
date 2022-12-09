@@ -46,7 +46,7 @@ const GameScreen = () => {
                     await getTrivimon(trivimons.pokemon_species, setPlayerTrivimon, changePlayerHPremaining);
                     await getTrivimon(trivimons.pokemon_species, setComputerTrivimon, changeComputerHPremaining);
 
-                    const triviaResponse = await fetch("https://opentdb.com/api.php?amount=10&difficulty=medium&type=multiple")
+                    const triviaResponse = await fetch("https://opentdb.com/api.php?amount=50&difficulty=medium&type=multiple")
                     const trivia = await triviaResponse.json();
 
                     setTrivia(trivia.results);
