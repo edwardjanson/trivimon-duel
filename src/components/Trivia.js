@@ -4,7 +4,7 @@ import './Trivia.css';
 import Typewriter from 'typewriter-effect';
 
 const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
-
+    
     const [questionFinished, setQuestionFinished] = useState(false);
     const [answerSelected, setAnswerSelected] = useState(false);
     const [answerCorrect, changeAnswerCorrect] = useState(null);
@@ -15,15 +15,13 @@ const Trivia = ({triviaToAnswer, changeTriviaAnswered}) => {
         } else {
             changeAnswerCorrect(false);
         }
-        console.log("answer", answer)
-        console.log("correct answer", triviaToAnswer.correct_answer)
         setAnswerSelected(true);
         setQuestionFinished(false);
     }
 
     const randomIndex = Math.floor(Math.random() * 3);
-    const options = triviaToAnswer.incorrect_answers
-    if (options.length !== 4) options.splice(randomIndex, 0, triviaToAnswer.correct_answer)
+    const options = triviaToAnswer.incorrect_answers;
+    if (options.length !== 4) options.splice(randomIndex, 0, triviaToAnswer.correct_answer);
     
     return (
         <>

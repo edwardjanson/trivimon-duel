@@ -37,7 +37,7 @@ const GameScreen = () => {
 
 
     useEffect( () => { 
-        if (!gameLoaded) {
+        if (gameStarted && !gameLoaded) {
             const fetchApis = async () => {
                 try {
                     const pokeResponse = await fetch("https://pokeapi.co/api/v2/generation/1/")
@@ -46,14 +46,15 @@ const GameScreen = () => {
                     await getTrivimon(trivimons.pokemon_species, setPlayerTrivimon, changePlayerHPremaining);
                     await getTrivimon(trivimons.pokemon_species, setComputerTrivimon, changeComputerHPremaining);
 
-                    const triviaResponse = await fetch("https://opentdb.com/api.php?amount=50&difficulty=medium&type=multiple")
-                    const triviaData = await triviaResponse.json();
+                    const triviaResponse = await fetch("https://opentdb.com/api.php?amount=10&difficulty=medium&type=multiple")
+                    const trivia = await triviaResponse.json();
 
-                    setTrivia(triviaData.results);
-                    changeGameLoaded(true);
+                    setTrivia(trivia.results);
+                    changeGameLoaded(true);                    
 
-                } catch {
-                    changeErrorLoading(true);
+                } catch (error) {
+                    changeErrorLoading(true)
+                    console.log(error)
                 }
             }
 
@@ -63,12 +64,12 @@ const GameScreen = () => {
             return;
         }
         else if (gameLoaded && firstTurn) {
-                playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
-                const randomIndex = Math.floor(Math.random() * trivia.length);
-                changeTriviaToAnswer(trivia[randomIndex]);
-                changeFirstTurn(false);
+            playerTrivimon.pace >= computerTrivimon.pace ? changePlayerTurn(true) : changePlayerTurn(false);
+            const randomIndex = Math.floor(Math.random() * trivia.length);
+            changeTriviaToAnswer(trivia[randomIndex]);
+            changeFirstTurn(false);
         }
-        else {
+        else if (gameLoaded) {
             if (!triviaToAnswer) {
                 const randomIndex = Math.floor(Math.random() * trivia.length);
                 changeTriviaToAnswer(trivia[randomIndex]);
@@ -112,7 +113,7 @@ const GameScreen = () => {
             }
         }
         // eslint-disable-next-line
-    }, [gameLoaded, errorLoading, triviaAnswered, textFinished]);
+    }, [gameStarted, gameLoaded, firstTurn, errorLoading, triviaAnswered, textFinished]);
 
 
     const onStartChange = () => {
@@ -128,6 +129,7 @@ const GameScreen = () => {
         changePlayerHPremaining(null);
         changeComputerHPremaining(null);
         changeGameLoaded(false);
+        changeFirstTurn(true);
         changeGameState(true);
     }
 
@@ -136,7 +138,7 @@ const GameScreen = () => {
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 5) * triviaMultiplier;
+            / 50) + 50) * triviaMultiplier;
         
         playerTurn ? 
         (computerHPremaining - damageTotal) < 0 ? changeComputerHPremaining(0) : changeComputerHPremaining(Math.round(computerHPremaining - damageTotal))
@@ -217,14 +219,14 @@ const GameScreen = () => {
                 !gameStarted ? 
                     !winner ?
                     <div className="Start">
-                    <Start winner={winner} onStartChange={onStartChange}/>
+                    <Start onStartChange={onStartChange}/>
                     </div>
                     :
                     <div className="Start">
                         <Start winner={winner} onNewGame={onNewGame} computerTrivimonName={computerTrivimon.name} onStartChange={onStartChange}/>
                     </div>
                 :
-                    !gameLoaded ?
+                    !gameLoaded || firstTurn ?
                         <div className="Start">
                             <p>Loading...</p>
                         </div>
