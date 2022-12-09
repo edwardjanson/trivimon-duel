@@ -138,7 +138,7 @@ const GameScreen = () => {
             playerTrivimon.iq / computerTrivimon.resilience
             :
             computerTrivimon.iq / playerTrivimon.resilience
-            / 50) + 50) * triviaMultiplier;
+            / 50) + 5) * triviaMultiplier;
         
         playerTurn ? 
         (computerHPremaining - damageTotal) < 0 ? changeComputerHPremaining(0) : changeComputerHPremaining(Math.round(computerHPremaining - damageTotal))
