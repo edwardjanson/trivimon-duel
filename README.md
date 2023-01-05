@@ -8,7 +8,7 @@
 
 ## Contents 
 
-* [Features](#features)
+* [Gameplay](#gameplay)
 * [Background](#background)
 * [Installation](#installation)
 
